@@ -10,3 +10,6 @@ tide = "0.16"
 async-std = { version = "1.10", features = ["attributes"] }
 sqlx = { version = "0.8", features = [ "runtime-async-std", "postgres", "chrono", "ipnetwork" ] }
 chrono = "0.4"
+surf = "2.3"
+urlencoding = "2.1"
+rand = "0.8"
