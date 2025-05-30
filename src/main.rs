@@ -16,8 +16,8 @@ struct IncomingRequest {
 
 #[tokio::main]
 async fn main() {
-    let total_requests = 100;
-    let concurrent = 100;
+    let total_requests = 10;
+    let concurrent = 10;
     let endpoint = "http://127.0.0.1:19000/incoming";
 
     let client = Client::new();
@@ -32,7 +32,7 @@ async fn main() {
         let req_data = IncomingRequest {
             account_username: "dwi_test".to_string(),
             msisdn: "6289630449253".to_string(),
-            password: "2GVcTANh".to_string(),
+            password: "12345678".to_string(),
             source: "dwi_test_sender".to_string(),
             message: format!("pesan_test_berantai_sebanyak_100_bersamaan_{}", i),
         };
