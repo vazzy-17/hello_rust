@@ -16,8 +16,8 @@ struct IncomingRequest {
 
 #[tokio::main]
 async fn main() {
-    let total_requests = 10;
-    let concurrent = 10;
+    let total_requests = 1;
+    let concurrent = 1;
     let endpoint = "http://127.0.0.1:19000/incoming";
 
     let client = Client::new();

@@ -1,31 +1,64 @@
 use tide::Request as TideRequest;
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
+use chrono::Local;
 
 #[derive(Debug, Deserialize)]
 struct SmsGwRequestInner {
-    accoount: String,
+    account: String,
     password: String,
     mobile: String,
     content: String,
     sender: String,
 }
 
-#[derive(Debug, Deserialize)]
-struct SmsGwRequest {
-    smsgwRq: SmsGwRequestInner,
+
+async fn send_delivery_report(mobile: &str, drstatus: &str, drresult: &str,msgid: &str){
+    let date = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
+
+     // 🔹 Gunakan `encode()` untuk mencegah masalah encoding di URL
+    let url = format!(
+        "http://127.0.0.1:19100/bozz?mobile={}&drstatus={}&drresult={}&drtime={}&msgid={}",
+        mobile,
+        drstatus,
+        drresult,
+        &date,
+        msgid
+    );
+
+    println!("📡 Sending request to: {}", url); // 🔹 Debugging log sebelum request
+
+    match surf::get(&url).await {
+        Ok(mut response) => {
+            let body = response.body_string().await.unwrap_or_else(|_| "No response body".to_string());
+            println!("✅ Delivery report sent successfully. Response: {}", body);
+        }
+        Err(err) => {
+            eprintln!("❌ Gagal mengirim delivery report: {:?}", err);
+        }
+    }
 }
 
+
 async fn handle_sms_request(mut req: TideRequest<()>) -> tide::Result {
-    let body: SmsGwRequest = req.body_json().await?;
+    let body: SmsGwRequestInner = req.body_json().await?;
     log::info!("Received SMS Request: {:?}", body);
+
+        let msgid = Uuid::new_v4().to_string();
+    log::info!("Generated msgid: {}", msgid);
+
+
+
+     
+    send_delivery_report(&body.mobile, "2", "Delivered", &msgid).await;
 
     // Simulasi respons (bisa sesuaikan status sesuai logika parsing di `parse_resp`)
     let response = serde_json::json!({
-        "smsgwRs": {
-            "msgid" : "inimsgid",
+     
+            "msgid" : msgid,
             "status": "100", // success
             "info" : "success"
-        }
+        
     });
 
     Ok(tide::Response::builder(200)
